@@ -1,1 +1,4 @@
 .idea
+*.mp3
+*.png
+/media
