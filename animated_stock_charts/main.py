@@ -181,7 +181,7 @@ def get_audio_filename():
     return f"{folder_path + selected_file}"
 
 
-def create_video(image_list, audio_file=get_audio_filename(), output_filename_marker=None):
+def create_video(symbol, image_list, audio_file=get_audio_filename(), output_filename_marker=None):
     if output_filename_marker == 'intraday':
         duration_of_candlestick_charts = 0.13
     elif output_filename_marker == 'quarterly':
@@ -231,7 +231,7 @@ def create_video(image_list, audio_file=get_audio_filename(), output_filename_ma
     video = video.set_audio(final_audio)
 
     log("Exporting final video")
-    video.write_videofile(f"stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4", fps=24)
+    video.write_videofile(f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4", fps=24)
 
 
 def clean_temp_files():
@@ -245,9 +245,8 @@ def clean_temp_files():
 
     # Remove temp video files that are not stock output videos
     video_files = glob.glob('temp_video*.mp4')
-    stock_output_files = glob.glob('stock*.mp4')
     for video in video_files:
-        if video not in stock_output_files:
+        if 'stock' not in video:
             try:
                 os.remove(video)
             except Exception as e:
@@ -268,7 +267,7 @@ def run_intraday_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, prev_close=prev_close, chart_title=f"{symbol} Intraday Action")
             images.append(img)
 
-        create_video(images, output_filename_marker='intraday')
+        create_video(symbol, images, output_filename_marker='intraday')
         log(f"Finished {symbol} INTRADAY")
 
 
@@ -324,7 +323,7 @@ def run_yearly_charts(symbols):
 
 
 def main():
-    symbols = ['SPY']
+    symbols = ['SPY', 'TSLA', 'AAPL', 'NET']
 
     run_intraday_charts(symbols)
     gc.collect()

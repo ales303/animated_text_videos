@@ -36,7 +36,7 @@ def get_stock_data_to_plot(symbol, only_get_most_recent_day=True, period_to_char
     log("Getting stock data to plot")
 
     if period_to_chart == '1m' and use_yfinance_data:
-        df = blast_off(stock_symbol=symbol, specific_date_to_process='2023-10-20')
+        df = blast_off(stock_symbol=symbol, specific_date_to_process=None)  # '2023-10-20'
         df = df[["datetime", "open", "high", "low", "close"]]
         log("Retrieved stock data to plot from yfinance")
 
