@@ -267,9 +267,15 @@ def run_intraday_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, prev_close=prev_close, chart_title=f"{symbol} Intraday Action")
             images.append(img)
 
-        audio_file = get_audio_filename()
-        log(f"audio_file = {audio_file}")
-        create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file)
+        try:
+            audio_file = get_audio_filename()
+            log(f"audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file)
+        except OSError:
+            audio_file = get_audio_filename()
+            log(f"RE-DO   audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file)
+
         log(f"Finished {symbol} INTRADAY")
 
 
@@ -286,9 +292,15 @@ def run_quarterly_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 3 Months")
             images.append(img)
 
-        audio_file = get_audio_filename()
-        log(f"audio_file = {audio_file}")
-        create_video(symbol, images, output_filename_marker='quarterly', audio_file=audio_file)
+        try:
+            audio_file = get_audio_filename()
+            log(f"audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='quarterly', audio_file=audio_file)
+        except OSError:
+            audio_file = get_audio_filename()
+            log(f"RE-DO   audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='quarterly', audio_file=audio_file)
+
         log(f"Finished {symbol} QUARTERLY")
 
 
@@ -305,9 +317,15 @@ def run_six_months_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 6 Months")
             images.append(img)
 
-        audio_file = get_audio_filename()
-        log(f"audio_file = {audio_file}")
-        create_video(symbol, images, output_filename_marker='six_months', audio_file=audio_file)
+        try:
+            audio_file = get_audio_filename()
+            log(f"audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='six_months', audio_file=audio_file)
+        except OSError:
+            audio_file = get_audio_filename()
+            log(f"RE-DO   audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='six_months', audio_file=audio_file)
+
         log(f"Finished {symbol} SIX MONTHS")
 
 
@@ -324,9 +342,15 @@ def run_yearly_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 12 Months")
             images.append(img)
 
-        audio_file = get_audio_filename()
-        log(f"audio_file = {audio_file}")
-        create_video(symbol, images, output_filename_marker='yearly', audio_file=audio_file)
+        try:
+            audio_file = get_audio_filename()
+            log(f"audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='yearly', audio_file=audio_file)
+        except OSError:
+            audio_file = get_audio_filename()
+            log(f"RE-DO   audio_file = {audio_file}")
+            create_video(symbol, images, output_filename_marker='yearly', audio_file=audio_file)
+
         log(f"Finished {symbol} YEARLY")
 
 
