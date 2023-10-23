@@ -36,7 +36,7 @@ def save_intro_images(symbol=None, second_image_text=None):
     plt.savefig(filename1, dpi=180)
 
     ax.text(0.5, 0.55, symbol, ha='center', va='center',
-            fontdict={'family': 'sans', 'color': 'darkblue', 'weight': 'bold', 'size': 30})
+            fontdict={'family': 'sans', 'color': 'black', 'weight': 'bold', 'size': 40})
 
     plt.tight_layout()
     filename2 = "temp_images/temp_intro_image2.png"
@@ -181,7 +181,7 @@ def get_audio_filename():
     return f"{folder_path + selected_file}"
 
 
-def create_video(symbol, image_list, audio_file=get_audio_filename(), output_filename_marker=None):
+def create_video(symbol, image_list, audio_file=None, output_filename_marker=None):
     if output_filename_marker == 'intraday':
         duration_of_candlestick_charts = 0.13
     elif output_filename_marker == 'quarterly':
@@ -267,7 +267,9 @@ def run_intraday_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, prev_close=prev_close, chart_title=f"{symbol} Intraday Action")
             images.append(img)
 
-        create_video(symbol, images, output_filename_marker='intraday')
+        audio_file = get_audio_filename()
+        log(f"audio_file = {audio_file}")
+        create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file)
         log(f"Finished {symbol} INTRADAY")
 
 
@@ -284,7 +286,9 @@ def run_quarterly_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 3 Months")
             images.append(img)
 
-        create_video(images, output_filename_marker='quarterly')
+        audio_file = get_audio_filename()
+        log(f"audio_file = {audio_file}")
+        create_video(symbol, images, output_filename_marker='quarterly', audio_file=audio_file)
         log(f"Finished {symbol} QUARTERLY")
 
 
@@ -301,7 +305,9 @@ def run_six_months_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 6 Months")
             images.append(img)
 
-        create_video(images, output_filename_marker='six_months')
+        audio_file = get_audio_filename()
+        log(f"audio_file = {audio_file}")
+        create_video(symbol, images, output_filename_marker='six_months', audio_file=audio_file)
         log(f"Finished {symbol} SIX MONTHS")
 
 
@@ -318,7 +324,9 @@ def run_yearly_charts(symbols):
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 12 Months")
             images.append(img)
 
-        create_video(images, output_filename_marker='yearly')
+        audio_file = get_audio_filename()
+        log(f"audio_file = {audio_file}")
+        create_video(symbol, images, output_filename_marker='yearly', audio_file=audio_file)
         log(f"Finished {symbol} YEARLY")
 
 
@@ -338,6 +346,7 @@ def main():
     gc.collect()
 
     clean_temp_files()
+
 
 if __name__ == "__main__":
     main()
