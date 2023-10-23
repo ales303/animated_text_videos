@@ -331,19 +331,19 @@ def run_yearly_charts(symbols):
 
 
 def main():
-    symbols = ['SPY', 'TSLA', 'AAPL', 'NET']
+    symbols = ['SPY', 'TSLA', 'AAPL', 'NET', 'META', 'MSFT', 'NFLX', 'AMZN', 'NVDA', 'QQQ', 'IWM', 'GOOG', 'PLTR',]
 
     run_intraday_charts(symbols)
     gc.collect()
 
-    run_quarterly_charts(symbols)
-    gc.collect()
-
-    run_six_months_charts(symbols)
-    gc.collect()
-
-    run_yearly_charts(symbols)
-    gc.collect()
+    # run_quarterly_charts(symbols)
+    # gc.collect()
+    #
+    # run_six_months_charts(symbols)
+    # gc.collect()
+    #
+    # run_yearly_charts(symbols)
+    # gc.collect()
 
     clean_temp_files()
 
