@@ -42,6 +42,12 @@ def get_stock_data_to_plot(symbol, only_get_most_recent_day=True, period_to_char
 
         df = create_new_stock_timeframe(df, output_mins_timeframe=2)
 
+        # Replace df index to reset the index timezone correctly
+        df['datetime2'] = df['datetime'].astype('str')
+        df['datetime2'] = df['datetime2'].str[:-6]
+        df['datetime2'] = pd.to_datetime(df['datetime2'])
+        df.set_index('datetime2', inplace=True)
+
         return df
 
     DB_CONNECTION_STRING = sqlalchemy_credentials(period_to_chart)

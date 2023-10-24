@@ -85,8 +85,8 @@ def save_candlestick_image(df, index, is_last_image=False, prev_close=None, char
         raise ValueError("gain_loss_color must be either 'green' or 'red'")
 
     # Convert 'Datetime' from string to datetime object
-    df['datetime'] = pd.to_datetime(df['datetime'])
-    df.set_index('datetime', inplace=True)
+    # df['datetime'] = pd.to_datetime(df['datetime'])
+    # df.set_index('datetime', inplace=True)
 
     # Style and plot settings
     style = mpf.make_mpf_style(base_mpf_style='yahoo', y_on_right=True)
