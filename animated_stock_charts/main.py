@@ -355,7 +355,7 @@ def run_yearly_charts(symbols):
 
 
 def main():
-    symbols = ['SPY', 'TSLA', 'AAPL', 'NET', 'META', 'MSFT', 'NFLX', 'AMZN', 'NVDA', 'QQQ', 'IWM', 'GOOG', 'PLTR',]
+    symbols = ['GME', 'SPY', 'TSLA', 'AAPL', 'NET', 'META', 'MSFT', 'NFLX', 'AMZN', 'NVDA', 'QQQ', 'IWM', 'GOOG', 'PLTR',]
 
     run_intraday_charts(symbols)
     gc.collect()

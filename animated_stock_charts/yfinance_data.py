@@ -9,12 +9,12 @@ def log(msg):
     print(f'\n{datetime.now()} {msg}')
 
 
-def blast_off(stock_symbol, specific_date_to_process=None):
+def blast_off(stock_symbol, specific_date_to_process=None, interval="1m"):
     now = datetime.now()
     today = now.date().strftime('%Y-%m-%d')
     today = today if not specific_date_to_process else specific_date_to_process
 
-    data = yf.download(f"{stock_symbol}", start=today, interval="1m")
+    data = yf.download(f"{stock_symbol}", start=today, interval=interval)
 
     # Using rename can be tasking when renaming a large number of columns.
     # I have included an easier way below
