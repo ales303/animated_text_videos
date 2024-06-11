@@ -17,7 +17,7 @@ def get_most_recent_close(symbol, days_back=0):
 
     log("Starting to get most recent close")
     now = datetime.datetime.now()
-    start_date = now - datetime.timedelta(days=5)
+    start_date = now - datetime.timedelta(days=10)
     start_date = start_date.strftime('%Y-%m-%d')
     df = blast_off(stock_symbol=symbol, specific_date_to_process=None, interval='1d', start_date=start_date)  # '2023-10-20'
     log("Retrieved stock daily close from yfinance")
