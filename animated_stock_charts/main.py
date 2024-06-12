@@ -307,7 +307,7 @@ def run_quarterly_charts(symbols):
         images = list(intro_images)
 
         for i in range(len(df)):
-            log(f"Making image {i} of {len(df)}")
+            log(f"Making image {i + 1} of {len(df)}")
             subset_df = df.iloc[:i + 1].copy()
             is_last_image = i == len(df) - 1
             img = save_candlestick_image(subset_df, i, is_last_image, chart_title=f"{symbol} Last 3 Months")
