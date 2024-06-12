@@ -223,8 +223,8 @@ def get_openai_video_description(symbol, daily_change):
 
     messages = [
         {"role": "system", "content": "You are making posts of videos on Instagram and TikTok. The videos are the intraday "
-                                      "trading action of stocks that people can watch to replay the day's action. "
-                                      "Each video shows the intraday action of just 1 stock."},
+                                      "trading action of stocks that people can watch to replay the day's action. Each "
+                                      "video shows the intraday action of just 1 stock."},
         {"role": "user", "content": prompt}
     ]
 
@@ -240,7 +240,7 @@ def get_openai_video_description(symbol, daily_change):
             )
             print("API response returned")
             print("Tokens used:", response['usage']['total_tokens'])
-            return response.choices[0].message['content'].strip()
+            return response['choices'][0]['message']['content'].strip()
 
         except openai.error.RateLimitError:
             wait_time = 2 ** retry  # Exponential backoff
