@@ -8,10 +8,11 @@ from sql_credentials import sqlalchemy_credentials
 from yfinance_data import blast_off
 import sqlite3
 from dotenv import load_dotenv
-import openai
 import time
 import logging
 import platform
+import openai
+from openai.error import RateLimitError, OpenAIError
 
 
 def log(msg):
@@ -215,16 +216,16 @@ def get_openai_video_description(symbol, daily_change):
     openai.api_key = os.environ.get("openai_api_key")
 
     prompt = f"""
-        Create a byline to publish with a Instagram or TikTok video for the stock symbol {symbol}, which today 
-        performed {daily_change}%. Keep it to 1  sentences about the daily performance and 1 brief sentence that says to 
-        Watch a recap. Use a $ in the beginning of the symbol like ${symbol}. DO NOT use emojis. Only use common words. Do not 
-        use the phrase 'Don't miss out'
-        """
+        Create a byline to publish with an Instagram or TikTok video for the stock symbol {symbol}, which today 
+        performed {daily_change}%. Keep it to 1 sentence about the daily performance and 1 brief sentence that says to 
+        watch a recap. Use a $ in the beginning of the symbol like ${symbol}. DO NOT use emojis. Only use common words. Do not 
+        use the phrase 'Don't miss out'.
+    """
 
     messages = [
         {"role": "system", "content": "You are making posts of videos on Instagram and \
-        TikTok. The videos are the intraday trading action of stocks that people can watch to replay the days action. \
-        Each video shows the intraday action of just 1 stock"},
+        TikTok. The videos are the intraday trading action of stocks that people can watch to replay the day's action. \
+        Each video shows the intraday action of just 1 stock."},
         {"role": "user", "content": prompt}
     ]
 
@@ -242,11 +243,11 @@ def get_openai_video_description(symbol, daily_change):
             print("Tokens used:", response['usage']['total_tokens'])
             return response.choices[0].message['content'].strip()
 
-        except openai.error.RateLimitError:
+        except RateLimitError:
             wait_time = 2 ** retry  # Exponential backoff
             logging.warning(f"Rate limit exceeded. Retrying in {wait_time} seconds...")
             time.sleep(wait_time)
-        except openai.error.OpenAIError as e:
+        except OpenAIError as e:
             logging.error(f"OpenAI API error: {e}")
             break
     return None
