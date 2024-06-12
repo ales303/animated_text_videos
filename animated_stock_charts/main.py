@@ -15,7 +15,7 @@ from moviepy.audio.fx import audio_fadeout as afx
 from variables import get_most_recent_close, get_stock_data_to_plot, log
 
 
-def save_intro_images(symbol=None, second_image_text=None):
+def save_intro_images(symbol=None, second_image_text=None, font='sans-serif'):
     if not os.path.exists('temp_images'):
         os.makedirs('temp_images')
 
@@ -25,25 +25,30 @@ def save_intro_images(symbol=None, second_image_text=None):
     fig, ax = plt.subplots(figsize=(10.8, 10.8))
     ax.axis('off')
 
+    # Dynamic date
+    current_date = datetime.datetime.now().strftime("%A %B %d, %Y")
+
     # Increased the y-coordinate for more top margin
     ax.text(0.5, 0.75, "Stock Replay", ha='center', va='center',
-            fontdict={'family': 'sans', 'color': 'darkblue', 'weight': 'bold', 'size': 40})
+            fontdict={'family': 'cursive', 'color': 'darkblue', 'weight': 'bold', 'size': 40})
     ax.text(0.5, 0.65, "in seconds", ha='center', va='center',
-            fontdict={'family': 'sans', 'color': 'darkblue', 'weight': 'normal', 'size': 30})
+            fontdict={'family': 'cursive', 'color': 'darkblue', 'weight': 'normal', 'size': 30})
 
     plt.tight_layout()
     filename1 = "temp_images/temp_intro_image1.png"
     plt.savefig(filename1, dpi=180)
 
     ax.text(0.5, 0.55, symbol, ha='center', va='center',
-            fontdict={'family': 'sans', 'color': 'black', 'weight': 'bold', 'size': 40})
+            fontdict={'family': font, 'color': 'black', 'weight': 'bold', 'size': 40})
 
     plt.tight_layout()
     filename2 = "temp_images/temp_intro_image2.png"
     plt.savefig(filename2, dpi=180)
 
     ax.text(0.5, 0.45, f"{'INTRADAY' if not second_image_text else second_image_text}", ha='center', va='center',
-            fontdict={'family': 'sans', 'color': 'red', 'weight': 'bold', 'size': 30})
+            fontdict={'family': 'cursive', 'color': 'red', 'weight': 'bold', 'size': 30})
+    ax.text(0.5, 0.35, current_date, ha='center', va='center',
+            fontdict={'family': 'cursive', 'color': 'black', 'weight': 'normal', 'size': 20})
 
     filename3 = "temp_images/temp_intro_image3.png"
     plt.savefig(filename3, dpi=180)
