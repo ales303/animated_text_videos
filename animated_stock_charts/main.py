@@ -247,6 +247,7 @@ def create_video(symbol, image_list, audio_file=None, output_filename_marker=Non
     video_description = get_openai_video_description(symbol=symbol, daily_change=f'{symbol_daily_change}')
     print(f'{datetime.datetime.now()} video_description created = {video_description}')
 
+    video_description = video_description.replace('"', '')
     insert_video_record(date=datetime.datetime.now().today(), symbol=symbol, filename=video_filename_no_directory, video_description=video_description)
     print(f'{datetime.datetime.now()} Video successfully created')
 
