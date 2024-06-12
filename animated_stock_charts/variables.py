@@ -7,6 +7,10 @@ from sqlalchemy import create_engine
 from sql_credentials import sqlalchemy_credentials
 from yfinance_data import blast_off
 import sqlite3
+from dotenv import load_dotenv
+import openai
+import time
+import logging
 
 
 def log(msg):
@@ -167,8 +171,10 @@ def create_animated_text_videos_db():
         date DATE,
         symbol TEXT,
         filename TEXT,
+        openai_annotation TEXT DEFAULT NULL,
         uploaded_to_instagram_date DATETIME DEFAULT NULL,
-        uploaded_to_tiktok_date DATETIME DEFAULT NULL
+        uploaded_to_tiktok_date DATETIME DEFAULT NULL,
+        video_description TEXT DEFAULT NULL
     );
     """
 
@@ -181,7 +187,7 @@ def create_animated_text_videos_db():
     print("Database and table created successfully.")
 
 
-def insert_video_record(date, symbol, filename):
+def insert_video_record(date, symbol, filename, video_description):
     # Connect to SQLite database
     conn = sqlite3.connect('animated_text_videos.db')
 
@@ -190,14 +196,56 @@ def insert_video_record(date, symbol, filename):
 
     # SQL command to insert a new record into the videos table
     insert_query = """
-    INSERT INTO videos (date, symbol, filename, uploaded_to_instagram_date, uploaded_to_tiktok_date)
-    VALUES (?, ?, ?, ?, ?);
+    INSERT INTO videos (date, symbol, filename, uploaded_to_instagram_date, uploaded_to_tiktok_date, video_description)
+    VALUES (?, ?, ?, ?, ?, ?);
     """
 
     # Execute the SQL command with the provided parameters
-    cursor.execute(insert_query, (date, symbol, filename))
+    cursor.execute(insert_query, (date, symbol, filename, video_description))
 
     # Commit the changes and close the connection
     conn.commit()
     conn.close()
     print("Record inserted successfully.")
+
+
+def get_openai_video_description(symbol, daily_change):
+    # Load the .env file
+    load_dotenv()
+    openai.key = os.environ.get("openai_api_key")
+
+    prompt = f"""
+        Create a byline to publish with a Instagram or TikTok video for the stock symbol {symbol}, which today 
+        performed {daily_change}. Keep it to 1-3 brief sentences, make it friendly and encouraging and enthusiastic.
+        Use a $ in the beginning of the symbol like ${symbol}.
+        """
+
+    messages = [
+        {"role": "system", "content": "You are an social media marketer who is making posts of videos on Instagram and \
+        TikTok. The videos are the intraday trading action of stocks that people can watch to replay the days action. \
+        Each video shows the intraday action of just 1 stock"},
+        {"role": "user", "content": prompt}
+    ]
+
+    max_retries = 5
+    for retry in range(max_retries):
+        try:
+            print("Sending to API")
+            response = openai.ChatCompletion.create(
+                model="gpt-4",
+                messages=messages,
+                n=1,
+                temperature=0.7
+            )
+            print("API response returned")
+            return response.choices[0].message['content'].strip()
+
+        except openai.error.RateLimitError:
+            wait_time = 2 ** retry  # Exponential backoff
+            logging.warning(f"Rate limit exceeded. Retrying in {wait_time} seconds...")
+            time.sleep(wait_time)
+        except openai.error.OpenAIError as e:
+            logging.error(f"OpenAI API error: {e}")
+            break
+    return None
+
