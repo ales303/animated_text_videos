@@ -175,7 +175,7 @@ def save_candlestick_image(df, index, is_last_image=False, prev_close=None, char
 
 def resize_image(img_path, target_size=(1080, 1080)):
     with Image.open(img_path) as img:
-        img = img.resize(target_size, Image.ANTIALIAS)
+        img = img.resize(target_size, Image.LANCZOS) if platform.system() == "Linux" else img.resize(target_size, Image.ANTIALIAS)
         img.save(img_path)
 
 
