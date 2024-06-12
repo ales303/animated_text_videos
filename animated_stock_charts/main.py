@@ -11,6 +11,7 @@ import gc
 from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
 from moviepy.video.fx import fadeout
 from moviepy.audio.fx import audio_fadeout as afx
+import platform
 
 from variables import get_most_recent_close, get_stock_data_to_plot, log, create_animated_text_videos_db, \
 insert_video_record, get_openai_video_description
@@ -169,7 +170,7 @@ def save_candlestick_image(df, index, is_last_image=False, prev_close=None, char
     plt.close()
     gc.collect()
 
-    return filename
+    return filename, percentage_change
 
 
 def resize_image(img_path, target_size=(1080, 1080)):
@@ -187,7 +188,7 @@ def get_audio_filename():
     return f"{folder_path + selected_file}"
 
 
-def create_video(symbol, image_list, audio_file=None, output_filename_marker=None):
+def create_video(symbol, image_list, audio_file=None, output_filename_marker=None, symbol_daily_change=None):
     if output_filename_marker == 'intraday':
         duration_of_candlestick_charts = 0.13
     elif output_filename_marker == 'quarterly':
@@ -238,10 +239,12 @@ def create_video(symbol, image_list, audio_file=None, output_filename_marker=Non
 
     log("Exporting final video")
     video_filename = f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4"
+    video_filename = f'/var/www/html/members.managed.capital/stock_videos/{video_filename}' if platform.system() == "Linux" else video_filename
+
     video.write_videofile(video_filename, fps=24)
 
     print(f'{datetime.datetime.now()} Starting to create video description, sending to OpenAI')
-    video_description = get_openai_video_description()
+    video_description = get_openai_video_description(symbol=symbol, daily_change=f'{symbol_daily_change}')
     print(f'{datetime.datetime.now()} video_description created = {video_description}')
 
     insert_video_record(date=datetime.datetime.now().today(), symbol=symbol, filename=video_filename, video_description=video_description)
@@ -278,17 +281,21 @@ def run_intraday_charts(symbols):
             log(f"Making image {i} of {len(df)}")
             subset_df = df.iloc[:i + 1].copy()
             is_last_image = i == len(df) - 1
-            img = save_candlestick_image(subset_df, i, is_last_image, prev_close=prev_close, chart_title=f"{symbol} Intraday Action")
+            img, percentage_change = save_candlestick_image(subset_df, i, is_last_image, prev_close=prev_close, chart_title=f"{symbol} Intraday Action")
             images.append(img)
+
+        percentage_change_plus_minus = '+' if percentage_change > 0 else ''
+        percentage_change = str(percentage_change)
+        percentage_change = percentage_change_plus_minus + percentage_change
 
         try:
             audio_file = get_audio_filename()
             log(f"audio_file = {audio_file}")
-            create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file)
+            create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file, symbol_daily_change=percentage_change)
         except OSError:
             audio_file = get_audio_filename()
             log(f"RE-DO   audio_file = {audio_file}")
-            create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file)
+            create_video(symbol, images, output_filename_marker='intraday', audio_file=audio_file, symbol_daily_change=percentage_change)
 
         log(f"Finished {symbol} INTRADAY")
 

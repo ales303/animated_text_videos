@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 import openai
 import time
 import logging
+import platform
 
 
 def log(msg):
@@ -158,7 +159,7 @@ def create_new_stock_timeframe(input_dataframe, output_mins_timeframe=30, resamp
 
 def create_animated_text_videos_db():
     # Connect to SQLite database (it will be created if it doesn't exist)
-    conn = sqlite3.connect('animated_text_videos.db')
+    conn = sqlite3.connect('/var/www/html/members.managed.capital/stock_videos/animated_text_videos.db') if platform.system() == "Linux" else sqlite3.connect('animated_text_videos.db')
 
     # Create a cursor object to execute SQL commands
     cursor = conn.cursor()
@@ -171,10 +172,9 @@ def create_animated_text_videos_db():
         date DATE,
         symbol TEXT,
         filename TEXT,
-        openai_annotation TEXT DEFAULT NULL,
+        video_description TEXT DEFAULT NULL,
         uploaded_to_instagram_date DATETIME DEFAULT NULL,
-        uploaded_to_tiktok_date DATETIME DEFAULT NULL,
-        video_description TEXT DEFAULT NULL
+        uploaded_to_tiktok_date DATETIME DEFAULT NULL
     );
     """
 
@@ -189,15 +189,15 @@ def create_animated_text_videos_db():
 
 def insert_video_record(date, symbol, filename, video_description):
     # Connect to SQLite database
-    conn = sqlite3.connect('animated_text_videos.db')
+    conn = sqlite3.connect('/var/www/html/members.managed.capital/stock_videos/animated_text_videos.db') if platform.system() == "Linux" else sqlite3.connect('animated_text_videos.db')
 
     # Create a cursor object to execute SQL commands
     cursor = conn.cursor()
 
     # SQL command to insert a new record into the videos table
     insert_query = """
-    INSERT INTO videos (date, symbol, filename, uploaded_to_instagram_date, uploaded_to_tiktok_date, video_description)
-    VALUES (?, ?, ?, ?, ?, ?);
+    INSERT INTO videos (date, symbol, filename, video_description)
+    VALUES (?, ?, ?, ?);
     """
 
     # Execute the SQL command with the provided parameters
@@ -212,16 +212,17 @@ def insert_video_record(date, symbol, filename, video_description):
 def get_openai_video_description(symbol, daily_change):
     # Load the .env file
     load_dotenv()
-    openai.key = os.environ.get("openai_api_key")
+    openai.api_key = os.environ.get("openai_api_key")
 
     prompt = f"""
         Create a byline to publish with a Instagram or TikTok video for the stock symbol {symbol}, which today 
-        performed {daily_change}. Keep it to 1-3 brief sentences, make it friendly and encouraging and enthusiastic.
-        Use a $ in the beginning of the symbol like ${symbol}.
+        performed {daily_change}%. Keep it to 1  sentences about the daily performance and 1 brief sentence that says to 
+        Watch a recap. Use a $ in the beginning of the symbol like ${symbol}. DO NOT use emojis. Only use common words. Do not 
+        use the phrase 'Don't miss out'
         """
 
     messages = [
-        {"role": "system", "content": "You are an social media marketer who is making posts of videos on Instagram and \
+        {"role": "system", "content": "You are making posts of videos on Instagram and \
         TikTok. The videos are the intraday trading action of stocks that people can watch to replay the days action. \
         Each video shows the intraday action of just 1 stock"},
         {"role": "user", "content": prompt}
@@ -238,6 +239,7 @@ def get_openai_video_description(symbol, daily_change):
                 temperature=0.7
             )
             print("API response returned")
+            print("Tokens used:", response['usage']['total_tokens'])
             return response.choices[0].message['content'].strip()
 
         except openai.error.RateLimitError:
