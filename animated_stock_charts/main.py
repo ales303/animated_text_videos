@@ -240,11 +240,12 @@ def create_video(symbol, image_list, audio_file=None, output_filename_marker=Non
     video_filename = f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4"
     video.write_videofile(video_filename, fps=24)
 
+    print(f'{datetime.datetime.now()} Starting to create video description, sending to OpenAI')
     video_description = get_openai_video_description()
-    print(f'video_description created = {video_description}')
+    print(f'{datetime.datetime.now()} video_description created = {video_description}')
 
     insert_video_record(date=datetime.datetime.now().today(), symbol=symbol, filename=video_filename, video_description=video_description)
-    print(f'Video successfully created')
+    print(f'{datetime.datetime.now()} Video successfully created')
 
 
 def clean_temp_files():
