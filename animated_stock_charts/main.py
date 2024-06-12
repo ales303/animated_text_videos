@@ -238,8 +238,8 @@ def create_video(symbol, image_list, audio_file=None, output_filename_marker=Non
     video = video.set_audio(final_audio)
 
     log("Exporting final video")
-    video_filename = f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4"
-    video_filename = f'/var/www/html/members.managed.capital/stock_videos/{video_filename}' if platform.system() == "Linux" else video_filename
+    video_filename_no_directory = f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4"
+    video_filename = f'/var/www/html/members.managed.capital/stock_videos/{video_filename_no_directory}' if platform.system() == "Linux" else video_filename_no_directory
 
     video.write_videofile(video_filename, fps=24)
 
@@ -247,7 +247,7 @@ def create_video(symbol, image_list, audio_file=None, output_filename_marker=Non
     video_description = get_openai_video_description(symbol=symbol, daily_change=f'{symbol_daily_change}')
     print(f'{datetime.datetime.now()} video_description created = {video_description}')
 
-    insert_video_record(date=datetime.datetime.now().today(), symbol=symbol, filename=video_filename, video_description=video_description)
+    insert_video_record(date=datetime.datetime.now().today(), symbol=symbol, filename=video_filename_no_directory, video_description=video_description)
     print(f'{datetime.datetime.now()} Video successfully created')
 
 
