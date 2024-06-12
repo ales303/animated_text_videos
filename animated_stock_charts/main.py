@@ -22,7 +22,7 @@ def save_intro_images(symbol=None, second_image_text=None):
     if not symbol:
         raise ValueError("Symbol needs to be specified in save_intro_images()")
 
-    fig, ax = plt.subplots(figsize=(6, 10.67))
+    fig, ax = plt.subplots(figsize=(10.8, 10.8))
     ax.axis('off')
 
     # Increased the y-coordinate for more top margin
@@ -112,7 +112,7 @@ def save_candlestick_image(df, index, is_last_image=False, prev_close=None, char
     fig, axes = mpf.plot(df, type='candle', style=style, addplot=ap, returnfig=True,
                          ylabel='Price',
                          ylim=(y_min, y_max),
-                         figsize=(6, 10.67),
+                         figsize=(10.8, 10.8),
                          tight_layout=True)
 
     # Set the main title and the subtitle for the chart
@@ -166,7 +166,7 @@ def save_candlestick_image(df, index, is_last_image=False, prev_close=None, char
     return filename
 
 
-def resize_image(img_path, target_size=(1088, 1920)):
+def resize_image(img_path, target_size=(1080, 1080)):
     with Image.open(img_path) as img:
         img = img.resize(target_size, Image.ANTIALIAS)
         img.save(img_path)
