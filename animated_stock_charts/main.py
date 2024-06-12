@@ -12,7 +12,8 @@ from moviepy.editor import ImageClip, concatenate_videoclips, AudioFileClip
 from moviepy.video.fx import fadeout
 from moviepy.audio.fx import audio_fadeout as afx
 
-from variables import get_most_recent_close, get_stock_data_to_plot, log
+from variables import get_most_recent_close, get_stock_data_to_plot, log, create_animated_text_videos_db, \
+insert_video_record
 
 
 def save_intro_images(symbol=None, second_image_text=None, font='sans-serif'):
@@ -236,7 +237,10 @@ def create_video(symbol, image_list, audio_file=None, output_filename_marker=Non
     video = video.set_audio(final_audio)
 
     log("Exporting final video")
-    video.write_videofile(f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4", fps=24)
+    video_filename = f"{symbol}_stock_replay_{output_filename_marker}_{datetime.datetime.now().date()}.mp4"
+    video.write_videofile(video_filename, fps=24)
+
+    insert_video_record(date=datetime.datetime.now().today(), symbol=symbol, filename=video_filename)
 
 
 def clean_temp_files():
@@ -360,6 +364,8 @@ def run_yearly_charts(symbols):
 
 
 def main():
+    create_animated_text_videos_db()
+
     symbols = ['GME', 'SPY', 'TSLA', 'AAPL', 'NET', 'META', 'MSFT', 'NFLX', 'AMZN', 'NVDA', 'QQQ', 'IWM', 'GOOG', 'PLTR',]
 
     run_intraday_charts(symbols)

@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sql_credentials import sqlalchemy_credentials
 from yfinance_data import blast_off
+import sqlite3
 
 
 def log(msg):
@@ -150,3 +151,53 @@ def create_new_stock_timeframe(input_dataframe, output_mins_timeframe=30, resamp
 
     return new_dataframe
 
+
+def create_animated_text_videos_db():
+    # Connect to SQLite database (it will be created if it doesn't exist)
+    conn = sqlite3.connect('animated_text_videos.db')
+
+    # Create a cursor object to execute SQL commands
+    cursor = conn.cursor()
+
+    # SQL command to create the videos table if it doesn't exist
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS videos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        created_timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+        date DATE,
+        symbol TEXT,
+        filename TEXT,
+        uploaded_to_instagram_date DATETIME DEFAULT NULL,
+        uploaded_to_tiktok_date DATETIME DEFAULT NULL
+    );
+    """
+
+    # Execute the SQL command
+    cursor.execute(create_table_query)
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+    print("Database and table created successfully.")
+
+
+def insert_video_record(date, symbol, filename):
+    # Connect to SQLite database
+    conn = sqlite3.connect('animated_text_videos.db')
+
+    # Create a cursor object to execute SQL commands
+    cursor = conn.cursor()
+
+    # SQL command to insert a new record into the videos table
+    insert_query = """
+    INSERT INTO videos (date, symbol, filename, uploaded_to_instagram_date, uploaded_to_tiktok_date)
+    VALUES (?, ?, ?, ?, ?);
+    """
+
+    # Execute the SQL command with the provided parameters
+    cursor.execute(insert_query, (date, symbol, filename))
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+    print("Record inserted successfully.")
