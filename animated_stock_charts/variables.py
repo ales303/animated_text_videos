@@ -12,11 +12,33 @@ import time
 import logging
 import platform
 import openai
+import pandas_market_calendars as mcal
+import numpy as np
 
 
 def log(msg):
     '''Simple logging with timestamp.'''
     print(f'\n{datetime.datetime.now()} {msg}')
+
+
+def market_day(date, exchange='NYSE'):
+    '''
+    Check if given date is a market day or not.
+    Args:
+        date (datetime): The date to check.
+        exchange (str): One of the supported exchanges:
+        NYSE, ASX,BMF,CFE, CME, EUREX, HKEX, ICE, JPX,
+        LSE, OSE,SIX, SSE,  TSX, BSE, TAS
+    Return: Bool
+    '''
+    # Return False for Saturdays and Sundays.
+    if date.weekday() > 4:
+        return False
+    date = np.datetime64(date.date())
+    ex = mcal.get_calendar(exchange)
+    holidays = ex.holidays()
+    return date not in holidays.holidays
+
 
 
 def get_most_recent_close(symbol, days_back=0):
@@ -250,3 +272,51 @@ def get_openai_video_description(symbol, daily_change):
             logging.error(f"OpenAI API error: {e}")
             break
     return None
+
+
+def delete_video_and_record_if_uploaded(folder_path):
+    # Connect to SQLite database
+    conn = sqlite3.connect(f'{folder_path}/animated_text_videos.db')
+
+    # Create a cursor object to execute SQL commands
+    cursor = conn.cursor()
+
+    # SQL command to select records where both upload dates are not null
+    select_query = """
+    SELECT id, filename 
+    FROM videos 
+    WHERE uploaded_to_instagram_date IS NOT NULL 
+    AND uploaded_to_tiktok_date IS NOT NULL;
+    """
+
+    # Execute the SQL command
+    cursor.execute(select_query)
+
+    # Fetch all matching records
+    records = cursor.fetchall()
+
+    for record in records:
+        video_id, filename = record
+
+        # Full path to the video file
+        file_path = os.path.join(folder_path, filename)
+
+        # Check if the file exists and delete it
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f"Deleted file: {file_path}")
+        else:
+            print(f"File not found: {file_path}")
+
+        # SQL command to delete the record from the videos table
+        delete_query = "DELETE FROM videos WHERE id = ?"
+
+        # Execute the SQL command to delete the record
+        cursor.execute(delete_query, (video_id,))
+        print(f"Deleted record with id: {video_id}")
+
+    # Commit the changes and close the connection
+    conn.commit()
+    conn.close()
+
+

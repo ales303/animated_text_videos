@@ -14,7 +14,7 @@ from moviepy.audio.fx import audio_fadeout as afx
 import platform
 
 from variables import get_most_recent_close, get_stock_data_to_plot, log, create_animated_text_videos_db, \
-insert_video_record, get_openai_video_description
+insert_video_record, get_openai_video_description, delete_video_and_record_if_uploaded, market_day
 
 
 def save_intro_images(symbol=None, second_image_text=None, font='sans-serif'):
@@ -377,23 +377,31 @@ def run_yearly_charts(symbols):
 
 
 def main():
-    create_animated_text_videos_db()
+    today = datetime.datetime.now()
+    print(market_day(today, exchange='NYSE'))
+    nyse = market_day(today, exchange='NYSE')
 
-    symbols = ['GME', 'SPY', 'TSLA', 'AAPL', 'NET', 'META', 'MSFT', 'NFLX', 'AMZN', 'NVDA', 'QQQ', 'GOOG', 'PLTR',]
+    if nyse:
+        # Market is open today
+        print('Today the market is open')
+        create_animated_text_videos_db()
 
-    run_intraday_charts(symbols)
-    gc.collect()
+        symbols = ['GME', 'SPY', 'TSLA', 'AAPL', 'NET', 'META', 'MSFT', 'NFLX', 'AMZN', 'NVDA', 'QQQ', 'GOOG', 'PLTR',]
 
-    # run_quarterly_charts(symbols)
-    # gc.collect()
-    #
-    # run_six_months_charts(symbols)
-    # gc.collect()
-    #
-    # run_yearly_charts(symbols)
-    # gc.collect()
+        run_intraday_charts(symbols)
+        delete_video_and_record_if_uploaded('/var/www/html/members.managed.capital/stock_videos')
+        gc.collect()
 
-    clean_temp_files()
+        # run_quarterly_charts(symbols)
+        # gc.collect()
+        #
+        # run_six_months_charts(symbols)
+        # gc.collect()
+        #
+        # run_yearly_charts(symbols)
+        # gc.collect()
+
+        clean_temp_files()
 
 
 if __name__ == "__main__":
