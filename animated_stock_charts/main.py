@@ -285,7 +285,7 @@ def run_intraday_charts(symbols):
             img, percentage_change = save_candlestick_image(subset_df, i, is_last_image, prev_close=prev_close, chart_title=f"{symbol} Intraday Action")
             images.append(img)
 
-        percentage_change_plus_minus = '+' if percentage_change > 0 else ''
+        percentage_change_plus_minus = '+' if float(percentage_change) > 0 else ''
         percentage_change = str(percentage_change)
         percentage_change = percentage_change_plus_minus + percentage_change
 
