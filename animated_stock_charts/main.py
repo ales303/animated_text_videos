@@ -123,11 +123,11 @@ def save_candlestick_image(df, index, is_last_image=False, prev_close=None, char
                          tight_layout=True)
 
     # Set the main title and the subtitle for the chart
-    axes[0].set_title(chart_title, fontsize=16, horizontalalignment='center', pad=20)
+    axes[0].set_title(chart_title, fontsize=16, horizontalalignment='center', pad=20, fontdict={'family': 'cursive'})
 
     last_date = df.index[-1]
     formatted_date = last_date.strftime('%A %B %d, %Y') if prev_close else last_date.strftime('%B %d, %Y')
-    axes[0].set_xlabel(formatted_date, fontsize=12, horizontalalignment='center', labelpad=10)
+    axes[0].set_xlabel(formatted_date, fontsize=12, horizontalalignment='center', labelpad=10, fontdict={'family': 'cursive'})
 
     # Manually add a legend for the Previous Day Close
     current_close_patch = plt.Line2D([0], [0], marker='o', color='#aaaaaa', markerfacecolor='#aaaaaa', markersize=10,
